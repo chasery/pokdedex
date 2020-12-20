@@ -1,6 +1,7 @@
 require("dotenv").config();
 const express = require("express");
 const morgan = require("morgan");
+const POKEDEX = require("./pokedex.json");
 
 const app = express();
 
@@ -47,7 +48,23 @@ function handleGetTypes(req, res) {
 app.get("/types", handleGetTypes);
 
 function handleGetPokemon(req, res) {
-  res.send("Hello, Pokemon!");
+  let response = POKEDEX.pokemon;
+
+  if (req.query.name) {
+    response = response.filter((pokemon) =>
+      pokemon.name.toLowerCase().includes(req.query.name.toLowerCase())
+    );
+  }
+
+  if (req.query.type) {
+    response = response.filter((pokemon) =>
+      pokemon.type
+        .map((t) => t.toLowerCase())
+        .includes(req.query.type.toLowerCase())
+    );
+  }
+
+  res.json(response);
 }
 
 app.get("/pokemon", handleGetPokemon);
